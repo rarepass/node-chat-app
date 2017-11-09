@@ -1,30 +1,35 @@
 var socket = io();
 
-socket.on("connect", () => {
-    console.log("Connected to server")
-
-    /*
-    socket.emit("createEmail", {
-        to: "oboro@example.com",
-        text: "ganbaru"
-    })*/
-    socket.emit("createMessage", {
-        from: "createMessage@example.com",
-        text: "ganbaru"
-    })
-
+socket.on('connect', function () {
+  console.log('Connected to server');
 });
 
-socket.on("disconnect", () => {
-    console.log("disconnected from server")
+socket.on('disconnect', function () {
+  console.log('Disconnected from server');
+});
+
+socket.on('newMessage', function (message) {
+  console.log('newMessage', message);
+  var li = jQuery("<li></li>");
+  li.text(`${message.from}: ${message.text}`);
+
+  jQuery("#messages").append(li)
+});
+
+socket.emit("createMessage",{
+    from: "index.js",
+    text: "createMessage"
+}, function(data){
+    console.log("got it", data)
 })
 
-/*
-socket.on("newEmail", (email)=> {
-    console.log("New email---")
-    console.log(email)
-})
-*/
-socket.on("newMessage", (message)=> {
-    console.log("New message", message)
-})
+jQuery('#message-form').on('submit', function (e) {
+  e.preventDefault();
+
+  socket.emit('createMessage', {
+    from: 'User',
+    text: jQuery('[name=message]').val()
+  }, function () {
+
+  });
+});
